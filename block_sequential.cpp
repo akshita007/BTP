@@ -42,6 +42,7 @@ int main()
 		{
 			change=0;
 			cnt++;
+			#pragma omp parallel for private(j,k,x,y,indx,dist) schedule(static) reduction(+:change)
 			for(i=0;i<N;i++)
 			{
 				indx=0;
@@ -70,10 +71,13 @@ int main()
 				}//calculated distance with every point
 				if(membership[i]!=indx)
                     change++;
+
 				membership[i]=indx;
+				#pragma omp atomic
 				newClusterSize[indx]++;
 				for(int j=0;j<dim;j++)
 				{
+				   #pragma omp atomic
                     newCluster[indx][j]+=points[i][j];
 				}
             }
