@@ -12,7 +12,7 @@ int main()
 		clock_t begin,end;
 		double elapsed_secs;
 		FILE *pFile;
-		pFile = fopen ("output.txt","r");
+		pFile = fopen ("Large_Input","r");
 		cin>>N>>dim>>K;
 		int i,k,j;
 		float cluster[K][dim];

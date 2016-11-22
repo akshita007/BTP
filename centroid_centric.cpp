@@ -20,7 +20,7 @@ int main()
 		float newCluster[dim][K];
 		int newClusterSize[K];
 		FILE *pFile;
-		pFile = fopen ("output.txt","r");
+		pFile = fopen ("Large_Input","r");
 		for(i=0;i<N;i++)
 		{
 			for(j=0;j<dim;j++)
@@ -92,7 +92,7 @@ int main()
 		for(k=0;k<K;k++)
 		{
 			for(j=0;j<dim;j++){
-                cout<<cluster[j][k]<<" ";
+                printf("%f ",cluster[j][k]);
 			}
 			cout<<endl;
 
