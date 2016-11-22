@@ -1,20 +1,59 @@
-
-
 #include<iostream>
 #include<limits.h>
-#include<float.h>
-#include<omp.h>
 #include<stdio.h>
-using namespace std;
+#include <ctime>
+#include <omp.h>
+#include <unistd.h>   
+#include <stdlib.h>
+#include <sys/types.h>  /* open() */
+#include <sys/stat.h>
+#include <getopt.h>
 
-int main()
+using namespace std;
+double points[10000000][10];
+
+static void usage(char *argv0) {
+    const char *help =
+        "Usage: %s [switches] -i filename -n num_clusters\n"
+        "       -n Number of points    : No of input data points\n"
+        "       -d Dimensionality    : Dimensionality of each point\n"	
+        "       -i filename    : file containing data to be clustered\n"
+        "       -k num_clusters: number of clusters (K must > 1)\n"
+        "       -h             : print this help information\n";
+    fprintf(stderr, help, argv0);
+    exit(-1);
+}
+
+
+
+int main(int argc, char *argv[])
 {
-        int N;
-		int K,dim;
-		//cout<<"Enter the number of points, dimensionality of each and the number of clusters";
-		//cin>>N>>
-		cin>>N>>dim>>K;
+		int N,K,dim;
+		int option;
+		char   *input_file;
+		clock_t begin,end;
+		double elapsed_secs;
+		FILE *pFile;
+		 while ((option = getopt(argc, argv,"n:d:k:i:")) != -1) {
+        		switch (option) {
+             			case 'n' : N=atoi(optarg);
+				break;
+             			case 'd' : dim=atoi(optarg);
+                 		break;
+             			case 'k' : K=atoi(optarg);
+                 		break;
+             			case 'i' : input_file=optarg;
+                 		break;
+             			default: usage(argv[0]); 
+                 		exit(EXIT_FAILURE);
+        		}
+    		}
+		pFile = fopen (input_file,"r");
 		int i,k,j;
+		if ( pFile == NULL) {
+    			printf("\nCould not open file");
+			return 0;
+  		}
 		float points[dim][N];//the objects will be stored dimension wise
 		float cluster[dim][K];
 		float newCluster[dim][K];
