@@ -5,13 +5,16 @@
 #include <ctime>
 #include <omp.h>
 using namespace std;
-
+float points[10000000][10];
 int main()
 {
 		int N,K,dim,hello;
 		int cnt=0;
 		clock_t begin,end;
 		double elapsed_secs;
+
+		/*FILE *pFile;
+		pFile = fopen ("input2.txt","r");*/
 		cin>>N>>dim>>K;
 		int i,k,j;
 		float points[N][dim];
@@ -23,13 +26,18 @@ int main()
 		for(i=0;i<N;i++)
 		{
 			for(j=0;j<dim;j++)
-				scanf("%f",&points[i][j]);
+				//fscanf(pFile,"%f",&points[i][j]);
+
+scanf("%f",&points[i][j]);
 			membership[i]=-1;
 		}
+		//fclose(pFile);
 		for(k=0;k<K;k++)
 		{
-			for(j=0;j<dim;j++)
+			for(j=0;j<dim;j++){
 				cluster[k][j]=points[k][j];
+				newCluster[k][j]=0;
+			}
 			newClusterSize[k]=0;
 			dist[k]=0;
 		}
@@ -46,7 +54,7 @@ int main()
 			for(i=0;i<N;i++)
 			{
 				indx=0;
-				int min_dist=INT_MAX;
+				min_dist=INT_MAX;
 				for( k=0;k<K;k+=2)
 				{
 					for(j=0;j<dim;j+=2)
@@ -95,7 +103,7 @@ int main()
 			//printf("Recalculation stage time = %lf\n",elapsed_secs);
 		}while(change>0);
 		clustering_timing=omp_get_wtime()-clustering_timing;
-		printf("Total time taken for sequential= %lf\n",clustering_timing);
+		printf("Total time taken for blocking= %lf\n",clustering_timing);
 		for(k=0;k<K;k++)
 		{
 			for(j=0;j<dim;j++)

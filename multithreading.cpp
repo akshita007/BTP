@@ -5,6 +5,7 @@
 #include <ctime>
 #include <omp.h>
 using namespace std;
+float points[10000000][10];
 
 int main()
 {
@@ -12,26 +13,27 @@ int main()
 		int cnt=0;
 		clock_t begin,end;
 		double elapsed_secs;
-		//cout<<"Enter the number of points, dimensionality of each and the number of clusters";
+		FILE *pFile;
+		pFile = fopen ("output.txt","r");
 		cin>>N>>dim>>K;
 		int i,k,j;
-		float points[N][dim];
 		float cluster[K][dim];
 		float newCluster[K][dim];
 		int membership[N],newClusterSize[K];
 		//#pragma omp for
 		for(i=0;i<N;i++)
 		{
-			//scanf("%d",&j);//ignoring the first number
 			for(j=0;j<dim;j++)
-				scanf("%f",&points[i][j]);
+				fscanf(pFile,"%f",&points[i][j]);
 			membership[i]=-1;
 		}
-		//#pragma omp for
+		fclose(pFile);
 		for(k=0;k<K;k++)
 		{
-			for(j=0;j<dim;j++)
+			for(j=0;j<dim;j++){
 				cluster[k][j]=points[k][j];
+				newCluster[k][j]=0;
+			}
 			newClusterSize[k]=0;
 		}
 		int change,indx;
@@ -41,17 +43,14 @@ int main()
 		cluster_timing = omp_get_wtime();
 		do
 		{
-			//objects assignment
-
 			change=0;
 			cnt++;
 			begin = clock();
-			#pragma omp parallel for private(i,j,k,indx,dist) schedule(static) reduction(+:change)
+			#pragma omp parallel for private(j,k,indx,dist) schedule(static) reduction(+:change) shared(points,cluster,membership,newCluster,newClusterSize)
 			for(i=0;i<N;i++)
 			{
 				indx=0;
-				//int tid = omp_get_thread_num();
-				int min_dist=INT_MAX;
+				double  min_dist=INT_MAX;
 				for( k=0;k<K;k++)
 				{
 					dist=0;
@@ -74,20 +73,13 @@ int main()
 					#pragma omp atomic
 					newCluster[indx][j]+=points[i][j];
 				}
-				//printf("Thread id=%d\n",tid);
 			}
-			//end = clock();
-			//elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-			//printf("Assignment stage time = %lf count=%d\n",elapsed_secs,cnt);
-			//begin=clock();
-			//#pragma omp parallel for
 			for(k=0;k<K;k++)
 			{
 				for(int j=0;j<dim;j++){
 						cluster[k][j]=newCluster[k][j]/newClusterSize[k];
 				newCluster[k][j]=0;
 				}
-				//cout<<newClusterSize[k]<<endl;
 				newClusterSize[k]=0;
 			}
 			//end=clock();
