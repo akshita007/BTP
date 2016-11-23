@@ -24,6 +24,22 @@ static void usage(char *argv0) {
     exit(-1);
 }
 
+double calculate_error(float points[][10],float *cluster,int membership[],int N ,int K,int dim)
+{
+	double error=0;
+	int i,j,k,p;
+float a;
+	for(i=0;i<N;i++)
+    	{
+        p=membership[i];
+        for(j=0;j<dim;j++){
+		a=*((cluster+p*dim)+j);
+            error=error+(points[i][j]-a)*(points[i][j]-a);
+    	}
+}
+    return error;
+	}
+
 
 
 int main(int argc, char *argv[])
@@ -34,7 +50,10 @@ int main(int argc, char *argv[])
 		clock_t begin,end;
 		double elapsed_secs;
 		FILE *pFile;
-		 while ((option = getopt(argc, argv,"n:d:k:i:")) != -1) {
+		FILE *tFile;
+		FILE *cFile;
+		char *time_file,*cluster_file;
+		 while ((option = getopt(argc, argv,"n:d:k:i:t:c:")) != -1) {
         		switch (option) {
              			case 'n' : N=atoi(optarg);
 				break;
@@ -44,6 +63,10 @@ int main(int argc, char *argv[])
                  		break;
              			case 'i' : input_file=optarg;
                  		break;
+				case 't' :time_file=optarg;
+				break;
+				case 'c':cluster_file=optarg;
+				break;
              			default: usage(argv[0]); 
                  		exit(EXIT_FAILURE);
         		}
@@ -136,13 +159,21 @@ int main(int argc, char *argv[])
 			//printf("Recalculation stage time = %lf\n",elapsed_secs);
 		}while(change>0);
 		clustering_timing=omp_get_wtime()-clustering_timing;
-		printf("Total time taken for blocking= %lf\n",clustering_timing);
+		tFile=fopen(time_file,"a");
+		fprintf(tFile,"Total time taken for n=%d d= %d k=%d Blocking K Means= %lf\n",N,dim,K,clustering_timing);
+		fprintf(tFile,"Total error= %f\n",calculate_error(points,(float *)cluster,membership,N,K,dim));
+		fclose(tFile);
+		cFile=fopen(cluster_file,"a");
+		fprintf(cFile,"Clusters from Blocking K Means\n");
 		for(k=0;k<K;k++)
 		{
 			for(j=0;j<dim;j++)
 			{
-                printf("%f ",cluster[k][j]);
+                		fprintf(cFile,"%f ",cluster[k][j]);
 			}
-			cout<<endl;
+			fprintf(cFile,"\n");
 		}
+		fprintf(cFile,"\n");
+		fclose(cFile);
+
     }

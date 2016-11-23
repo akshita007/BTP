@@ -8,9 +8,14 @@
 #include <sys/types.h>  /* open() */
 #include <sys/stat.h>
 #include <getopt.h>
+#include<float.h>
 
 using namespace std;
-double points[10000000][10];
+float points[10][3000000];
+int membership[3000000];
+int newmembership[3000000];
+float min_dist[3000000];
+//float dist[3000000];
 
 static void usage(char *argv0) {
     const char *help =
@@ -54,19 +59,19 @@ int main(int argc, char *argv[])
     			printf("\nCould not open file");
 			return 0;
   		}
-		float points[dim][N];//the objects will be stored dimension wise
 		float cluster[dim][K];
 		float newCluster[dim][K];
+float dist[N];
 		omp_lock_t writelock[N];
         for(i=0;i<N;i++)
             omp_init_lock(&writelock[i]);
-
-		int membership[N],newClusterSize[K],newmembership[N];
+ 
+		int newClusterSize[K];
 		for(i=0;i<N;i++)
 		{
 			//cin>>j;//ignoring the first number
 			for(j=0;j<dim;j++)
-				cin>>points[j][i];
+				fscanf(pFile,"%f",&points[j][i]);
 			membership[i]=-1;
 		}//random initialization
 		for(j=0;j<dim;j++)
@@ -75,7 +80,6 @@ int main(int argc, char *argv[])
 				cluster[j][k]=points[j][k];
 		}
 		int change=0,indx;
-		float min_dist[N],dist[N];
 		double clustering_timing=omp_get_wtime();
 		do
 		{
@@ -85,10 +89,12 @@ int main(int argc, char *argv[])
 				min_dist[i]=FLT_MAX;
 				dist[i]=0;
 			}
-			#pragma omp parallel for private(dist,i,j)
+			#pragma omp parallel for private(dist,i,j,k) shared(min_dist,writelock,newClusterSize,newCluster) schedule(static)
 			for(k=0;k<K;k++)
 			{
+				//cout<<"Implemented"<<k<<endl;
 				newClusterSize[k]=0;
+				//cout<<"Hey";
 				for(j=0;j<dim;j++)
 				{
 					newCluster[j][k]=0;
@@ -97,21 +103,16 @@ int main(int argc, char *argv[])
 						dist[i]+=(cluster[j][k]-points[j][i])*(cluster[j][k]-points[j][i]);
 					}
 				}
-
 				for(i=0;i<N;i++)
 				{
-				//#pragma omp critical
-				//{
 				omp_set_lock(&(writelock[i]));
 					if(min_dist[i]>dist[i])
 					{
 						newmembership[i]=k;
 						min_dist[i]=dist[i];
 					}
-                omp_unset_lock(&(writelock[i]));
-
-                //}
-					dist[i]=0;
+                		omp_unset_lock(&(writelock[i]));
+				dist[i]=0;
 				}
 			}
 			for(j=0;j<dim;j++)
@@ -136,6 +137,7 @@ int main(int argc, char *argv[])
 				for(j=0;j<dim;j++)
 					cluster[j][k]=newCluster[j][k]/newClusterSize[k];
 			}
+	//cout<<"Implemented"<<endl;
         }while(change>0);
 		clustering_timing=omp_get_wtime()-clustering_timing;
 		printf("Total time taken for centroid centric= %lf\n",clustering_timing);

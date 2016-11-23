@@ -40,7 +40,10 @@ int main(int argc, char *argv[])
 		clock_t begin,end;
 		double elapsed_secs;
 		FILE *pFile;
-		 while ((option = getopt(argc, argv,"n:d:k:i:")) != -1) {
+		 FILE *tFile;
+		FILE *cFile;
+		char *time_file,*cluster_file;
+		 while ((option = getopt(argc, argv,"n:d:k:i:t:c:")) != -1) {
         		switch (option) {
              			case 'n' : N=atoi(optarg);
 				break;
@@ -50,6 +53,10 @@ int main(int argc, char *argv[])
                  		break;
              			case 'i' : input_file=optarg;
                  		break;
+				case 't' :time_file=optarg;
+				break;
+				case 'c':cluster_file=optarg;
+				break;
              			default: usage(argv[0]); 
                  		exit(EXIT_FAILURE);
         		}
@@ -130,13 +137,19 @@ int main(int argc, char *argv[])
 			}
 		}while(change>0);
 		clustering_timing=omp_get_wtime()-clustering_timing;
-		printf("Total time taken for centroid centric= %lf\n",clustering_timing);
+		tFile=fopen(time_file,"a");
+		fprintf(tFile,"Total time taken for n=%d d= %d k=%d Centroid Centric K Means= %lf\n",N,dim,K,clustering_timing);
+		fclose(tFile);
+		cFile=fopen(cluster_file,"a");
+		fprintf(cFile,"Clusters from Centroid Centric K Means\n");
 		for(k=0;k<K;k++)
 		{
-			for(j=0;j<dim;j++){
-                printf("%f ",cluster[j][k]);
+			for(j=0;j<dim;j++)
+			{
+                		fprintf(cFile,"%f ",cluster[j][k]);
 			}
-			cout<<endl;
-
+			fprintf(cFile,"\n");
 		}
+		fprintf(cFile,"\n");
+		fclose(cFile);
 }

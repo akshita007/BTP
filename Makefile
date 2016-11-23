@@ -4,7 +4,7 @@ CFLAGS=-I.
 tiling_file=blocking.cpp
 sequential_file=sequential.cpp
 centroid_file=centroid_centric.cpp
-thread_file=multithreading.cpp
+thread_file=a2.cpp
 input_file=Large_Input
 
 number_of_points = 100
@@ -25,10 +25,10 @@ threading:
 	$(CC) $(thread_file) -fopenmp -o thread.o
 
 run:
-	./block.o  -n ${number_of_points} -d ${dimension} -k ${number_of_clusters} -i ${input_file}
-	./seqn.o  -n ${number_of_points} -d ${dimension} -k ${number_of_clusters} -i ${input_file} 
-	./centroid.o  -n ${number_of_points} -d ${dimension} -k ${number_of_clusters} -i ${input_file}
-	./thread.o  -n ${number_of_points} -d ${dimension} -k ${number_of_clusters} -i ${input_file}
+	./block.o  -n ${number_of_points} -d ${dimension} -k ${number_of_clusters} -i ${input_file} -t time -c clusters
+	./seqn.o  -n ${number_of_points} -d ${dimension} -k ${number_of_clusters} -i ${input_file} -t time -c clusters
+	./centroid.o  -n ${number_of_points} -d ${dimension} -k ${number_of_clusters} -i ${input_file} -t time -c clusters
+	./thread.o  -n ${number_of_points} -d ${dimension} -k ${number_of_clusters} -i ${input_file}  -t time -c clusters
 
 clean:
-	rm *.o
+	rm *.o time clusters
