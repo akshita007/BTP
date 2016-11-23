@@ -145,7 +145,7 @@ int main(int argc, char *argv[])
 		clustering_timing=omp_get_wtime()-clustering_timing;
 		tFile=fopen(time_file,"a");
 		fprintf(tFile,"Total time taken for n=%d d= %d k=%d Threaded K Means= %lf\n",N,dim,K,clustering_timing);
-		fprintf(tFile,"Total error= %f\n",calculate_error(points,(float *)cluster,membership,N,K,dim));
+		fprintf(tFile,"Total error= %f\n\n",calculate_error(points,(float *)cluster,membership,N,K,dim));
 		fclose(tFile);
 		cFile=fopen(cluster_file,"a");
 		fprintf(cFile,"Clusters from Threaded K Means\n");

@@ -25,11 +25,11 @@ static void usage(char *argv0) {
     exit(-1);
 }
 
-double calculate_error(float points[][10],float *cluster,int membership[],int N ,int K,int dim)
+float calculate_error(float points[][10],float *cluster,int membership[],int N ,int K,int dim)
 {
-	double error=0;
+	float error=0;
 	int i,j,k,p;
-float a;
+	float a;
 	for(i=0;i<N;i++)
     	{
         p=membership[i];
@@ -37,7 +37,7 @@ float a;
 		a=*((cluster+p*dim)+j);
             error=error+(points[i][j]-a)*(points[i][j]-a);
     	}
-}
+	}
     return error;
 	}
 int main(int argc, char *argv[])
@@ -74,8 +74,8 @@ int main(int argc, char *argv[])
     			printf("\nCould not open file");
 			return 0;
   		}
-		double cluster[K][dim];
-		double newCluster[K][dim];
+		float cluster[K][dim];
+		float newCluster[K][dim];
 		int membership[N],newClusterSize[K];
 		for(i=0;i<N;i++)
 		{
@@ -139,7 +139,7 @@ int main(int argc, char *argv[])
 		clustering_timing=omp_get_wtime()-clustering_timing;
 		tFile=fopen(time_file,"a");
 		fprintf(tFile,"Total time taken for n=%d d= %d k=%d Sequential K Means= %lf\n",N,dim,K,clustering_timing);
-		fprintf(tFile,"Total error= %f\n",calculate_error(points,(float *)cluster,membership,N,K,dim));		
+		fprintf(tFile,"Total error= %f\n\n",calculate_error(points,(float *)cluster,membership,N,K,dim));		
 		fclose(tFile);
 		cFile=fopen(cluster_file,"a");
 		fprintf(cFile,"Clusters from Sequential K Means\n");

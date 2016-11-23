@@ -30,6 +30,23 @@ static void usage(char *argv0) {
     exit(-1);
 }
 
+float calculate_error(float points[][3000000],float *cluster,int membership[],int N ,int K,int dim)
+{
+	float error=0;
+	int i,j,k,p;
+	float a;
+	for(i=0;i<N;i++)
+    	{
+        p=membership[i];
+        for(j=0;j<dim;j++){
+		a=*((cluster+j*K)+p);
+            error=error+(points[j][i]-a)*(points[j][i]-a);
+    	}
+	}
+    return error;
+	}
+
+
 
 
 int main(int argc, char *argv[])
@@ -139,6 +156,7 @@ int main(int argc, char *argv[])
 		clustering_timing=omp_get_wtime()-clustering_timing;
 		tFile=fopen(time_file,"a");
 		fprintf(tFile,"Total time taken for n=%d d= %d k=%d Centroid Centric K Means= %lf\n",N,dim,K,clustering_timing);
+		fprintf(tFile,"Total error= %f\n\n",calculate_error(points,(float *)cluster,membership,N,K,dim));		
 		fclose(tFile);
 		cFile=fopen(cluster_file,"a");
 		fprintf(cFile,"Clusters from Centroid Centric K Means\n");

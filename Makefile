@@ -4,12 +4,12 @@ CFLAGS=-I.
 tiling_file=blocking.cpp
 sequential_file=sequential.cpp
 centroid_file=centroid_centric.cpp
-thread_file=a2.cpp
+thread_file=multithreading.cpp
 input_file=Large_Input
 
-number_of_points = 100
+number_of_points = 2075100
 dimension=7
-number_of_clusters=4
+number_of_clusters= 10
 
 all: tiling sequential centroid threading run
 tiling:
